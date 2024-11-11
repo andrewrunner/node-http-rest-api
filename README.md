@@ -21,7 +21,7 @@ https://neon.tech/postgresql/postgresql-getting-started/postgresql-sample-databa
 ## Installation & Run
 ```bash
 
-# run dev server 
+# run dev server (it automaticaly create db and seed data)
 docker-compose up -d dvd-rental-api
 
 
