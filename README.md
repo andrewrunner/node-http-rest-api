@@ -24,6 +24,10 @@ https://neon.tech/postgresql/postgresql-getting-started/postgresql-sample-databa
 # run dev server 
 docker-compose up -d dvd-rental-api
 
+
+#run tests
+docker-compose run dvd-rental-api npm test
+
 ```
 
 

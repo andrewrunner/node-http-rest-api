@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "node --env-file=.env src/index.js",
     "dev": "nodemon --exec node -r ts-node/register --env-file=.env.dev ./src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node -r ts-node/register --test ./test/**.test.ts"
   },
   "dependencies": {
     "pg": "^8.13.1",

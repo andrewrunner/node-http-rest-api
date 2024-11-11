@@ -34,13 +34,13 @@ export class Server {
          });
 
          this.server.listen(port);
-         console.log('server started')
+         console.log(`Server started port: ${port}`)
     }
 
     async stop() {
         if (this.server) {
             this.server.close();
-            console.log('server closed')
+            console.log('Server closed')
         }
     }
 }

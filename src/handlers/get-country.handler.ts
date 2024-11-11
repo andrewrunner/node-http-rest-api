@@ -1,18 +1,31 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { RequestHandler } from "../lib/request/request-handler";
 import CountryModel from "../models/country.model";
+import { getCacheKeyFromRequest, sendJsonData } from "../lib/util";
 
 
 export class GetCountryHandler extends RequestHandler {
 
-    private kacheKey = 'country';
-
     async handle(req:IncomingMessage, res:ServerResponse) {
 
-        const data = await CountryModel.findAll();
+        const kacheKey = getCacheKeyFromRequest(req);
 
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.write(JSON.stringify({ data: data }));
-        res.end();
+        if(this.isFetchingFromDB.isLock(kacheKey)) {
+            await this.isFetchingFromDB.waitUntilUnlock(kacheKey);
+        }
+  
+        const cachedData = await this.requestCache.get(kacheKey);
+        if(cachedData) {
+            return sendJsonData(res, cachedData);
+        }
+  
+        this.isFetchingFromDB.lock(kacheKey);
+
+        const data = await CountryModel.findAll();
+  
+        this.requestCache.set(kacheKey, data)
+        this.isFetchingFromDB.unlock(kacheKey);
+  
+        return sendJsonData(res, data);  
     }
 }

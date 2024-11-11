@@ -4,7 +4,6 @@ import { RequestHandler } from "../lib/request/request-handler";
 import FilmModel from "../models/film.model";
 import { getCacheKeyFromRequest, getQueryParams, sendJsonData } from "../lib/util";
 
-
 export class GetFilmHandler extends RequestHandler {
 
     async handle(req:IncomingMessage, res:ServerResponse) {
@@ -17,7 +16,7 @@ export class GetFilmHandler extends RequestHandler {
           await this.isFetchingFromDB.waitUntilUnlock(kacheKey);
         }
 
-        const cachedData = await this.requestCache.get(kacheKey, query);
+        const cachedData = await this.requestCache.get(kacheKey);
         if(cachedData) {
             return sendJsonData(res, cachedData);
         }
@@ -31,7 +30,7 @@ export class GetFilmHandler extends RequestHandler {
 
         const data = await FilmModel.findAll(findParams);
 
-        this.requestCache.set(kacheKey, query, data, 10)
+        this.requestCache.set(kacheKey, data)
         this.isFetchingFromDB.unlock(kacheKey);
 
         return sendJsonData(res, data);

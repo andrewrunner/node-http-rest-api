@@ -30,7 +30,6 @@ services:
       - '5432:5432'
     volumes:
       - db-volume:/var/lib/postgresql/data
-      # - ./src/database/init:/docker-entrypoint-initdb.d
 
   
   dvd-rental-cache:

@@ -19,8 +19,15 @@ export class InMemoryCache {
         return Promise.resolve(null);;
     }
 
+    /**
+     * @param key 
+     * @param value
+     * @param ttl - time to live in seconds
+     */
     set(key:string, value:any, ttl:number) {
+        const ttlInMs = ttl * 1000;
+
         this.cache.set(key, value); 
-        this.cacheTTLMap.set(key, Date.now() + ttl);
+        this.cacheTTLMap.set(key, Date.now() + ttlInMs);
     }
 }

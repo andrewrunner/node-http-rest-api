@@ -1,18 +1,30 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { RequestHandler } from "../lib/request/request-handler";
 import PaymentModel from "../models/payment.model";
-
+import { getCacheKeyFromRequest, sendJsonData } from "../lib/util";
 
 export class GetPaymentHandler extends RequestHandler {
 
-    private kacheKey = 'payment';
-
     async handle(req:IncomingMessage, res:ServerResponse) {
 
-        const data = await PaymentModel.findAll();
+        const kacheKey = getCacheKeyFromRequest(req);
 
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.write(JSON.stringify({ data: data }));
-        res.end();
+        if(this.isFetchingFromDB.isLock(kacheKey)) {
+            await this.isFetchingFromDB.waitUntilUnlock(kacheKey);
+        }
+  
+        const cachedData = await this.requestCache.get(kacheKey);
+        if(cachedData) {
+            return sendJsonData(res, cachedData);
+        }
+  
+        this.isFetchingFromDB.lock(kacheKey);
+
+        const data = await PaymentModel.findAll();
+  
+        this.requestCache.set(kacheKey, data)
+        this.isFetchingFromDB.unlock(kacheKey);
+  
+        return sendJsonData(res, data); 
     }
 }

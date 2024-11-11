@@ -18,7 +18,7 @@ export class Locker {
         this.keys.delete(key);
     }
 
-    async waitUntilUnlock(key:string, ttl:number|null = null) {
+    async waitUntilUnlock(key:string) {
        //console.log('waitUntilUnlock', key)
         while(this.isLock(key)) {
             await new Promise(resolve => setTimeout(resolve, 100));

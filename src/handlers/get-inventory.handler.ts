@@ -1,18 +1,30 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { RequestHandler } from "../lib/request/request-handler";
 import InventoryModel from "../models/inventory.model";
-
+import { getCacheKeyFromRequest, sendJsonData } from "../lib/util";
 
 export class GetInventoryHandler extends RequestHandler {
 
-    private kacheKey = 'inventory';
-
     async handle(req:IncomingMessage, res:ServerResponse) {
 
-        const data = await InventoryModel.findAll();
+        const kacheKey = getCacheKeyFromRequest(req);
 
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.write(JSON.stringify({ data: data }));
-        res.end();
+        if(this.isFetchingFromDB.isLock(kacheKey)) {
+            await this.isFetchingFromDB.waitUntilUnlock(kacheKey);
+        }
+  
+        const cachedData = await this.requestCache.get(kacheKey);
+        if(cachedData) {
+            return sendJsonData(res, cachedData);
+        }
+  
+        this.isFetchingFromDB.lock(kacheKey);
+
+        const data = await InventoryModel.findAll();
+  
+        this.requestCache.set(kacheKey, data)
+        this.isFetchingFromDB.unlock(kacheKey);
+  
+        return sendJsonData(res, data); 
     }
 }
