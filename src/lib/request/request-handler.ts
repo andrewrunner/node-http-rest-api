@@ -1,16 +1,16 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { RequestHandlersCache } from "./request-handlers-cache";
-import { Locker } from "../locker";
+import { Mutex } from "../mutex";
 
 
 export class RequestHandler {
 
-    protected isFetchingFromDB:Locker;
+    protected isFetchingFromDB:Mutex;
     
     constructor(
         protected requestCache:RequestHandlersCache
     ) { 
-        this.isFetchingFromDB = new Locker();
+        this.isFetchingFromDB = new Mutex();
     }
 
     async handle(req:IncomingMessage, res:ServerResponse) {

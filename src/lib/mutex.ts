@@ -1,5 +1,5 @@
 
-export class Locker {
+export class Mutex {
 
     private keys = new Set();
 
