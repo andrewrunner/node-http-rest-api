@@ -36,7 +36,7 @@ docker-compose run --rm dvd-rental-api npm test
 
 Error: "/usr/local/bin/docker-entrypoint.sh: line 174: /docker-entrypoint-initdb.d/restore.sh: cannot execute: required file not found" 
 
-Try install project through downloading as zip, not through "git clone..."clone..."  
+Try install project through downloading as zip, not through "git clone..."  
 
 
 ## API
