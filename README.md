@@ -24,6 +24,10 @@ https://neon.tech/postgresql/postgresql-getting-started/postgresql-sample-databa
 # run dev server (it automaticaly create db and seed data)
 docker-compose up -d dvd-rental-api
 
+# for development you need also install dependecies localy (not only in image volume)
+#  api-npm - dedicated "utility" container
+docker-compose run --rm api-npm i
+
 
 #run tests
 docker-compose run --rm dvd-rental-api npm test

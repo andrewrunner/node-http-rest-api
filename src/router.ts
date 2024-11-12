@@ -22,7 +22,6 @@ import { HTTP_METHODS, IRoute } from "./lib/types";
 
 const inMemoryCache = new InMemoryCache();
 const redisCache = redisClient;
-//@ts-ignore
 const requestHandlersCache = new RequestHandlersCache(redisCache, inMemoryCache);
 
 
