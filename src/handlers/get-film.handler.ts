@@ -2,7 +2,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import { Op } from "sequelize";
 import { RequestHandler } from "../lib/request/request-handler";
 import FilmModel from "../models/film.model";
-import { getCacheKeyFromRequest, getQueryParams, sendJsonData } from "../lib/util";
+import { getCacheKeyFromRequest, getQueryParams, sendJsonData, sendJsonError } from "../lib/util";
 
 export class GetFilmHandler extends RequestHandler {
 
@@ -20,19 +20,21 @@ export class GetFilmHandler extends RequestHandler {
         if(cachedData) {
             return sendJsonData(res, cachedData);
         }
-
-
-        this.isFetchingFromDB.lock(kacheKey);
-
+        
         const findParams = (query.title)
-        ? { where: { title: { [Op.like]: `${query.title}%` }}}
-        : {};
+            ? { where: { title: { [Op.like]: `${query.title}%` }}}
+            : {};
 
-        const data = await FilmModel.findAll(findParams);
-
-        this.requestCache.set(kacheKey, data)
-        this.isFetchingFromDB.unlock(kacheKey);
-
-        return sendJsonData(res, data);
+            
+        this.isFetchingFromDB.lock(kacheKey);
+        try {
+            const data = await FilmModel.findAll(findParams);
+            this.requestCache.set(kacheKey, data)
+            return sendJsonData(res, data);
+        } catch(e) {
+            return sendJsonError(res)
+        } finally {
+            this.isFetchingFromDB.unlock(kacheKey);
+        }
     }
 }

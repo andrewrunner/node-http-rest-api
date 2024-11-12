@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { RequestHandler } from "../lib/request/request-handler";
 import ActorModel from "../models/actor.model";
-import { getCacheKeyFromRequest, sendJsonData } from "../lib/util";
+import { getCacheKeyFromRequest, sendJsonData, sendJsonError } from "../lib/util";
 
 
 export class GetActorsHandler extends RequestHandler {
@@ -19,13 +19,16 @@ export class GetActorsHandler extends RequestHandler {
             return sendJsonData(res, cachedData);
         }
   
+        
         this.isFetchingFromDB.lock(kacheKey);
-
-        const data = await ActorModel.findAll();
-  
-        this.requestCache.set(kacheKey, data)
-        this.isFetchingFromDB.unlock(kacheKey);
-  
-        return sendJsonData(res, data);
+        try {
+            const data = await ActorModel.findAll();
+            this.requestCache.set(kacheKey, data)
+            return sendJsonData(res, data);
+        } catch (e) {
+            return sendJsonError(res)
+        } finally {
+            this.isFetchingFromDB.unlock(kacheKey);
+        }
     }
 }

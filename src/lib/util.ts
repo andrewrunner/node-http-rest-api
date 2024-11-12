@@ -8,7 +8,13 @@ export function getQueryParams<T>(req:IncomingMessage) {
 
 export async function sendJsonData(res:ServerResponse,  data:any) {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.write(JSON.stringify({ data: data }));
+    res.write(JSON.stringify({ data }));
+    res.end();
+}
+
+export async function sendJsonError(res:ServerResponse, message:any = null, code:number = 500) {
+    res.writeHead(code, { 'Content-Type': 'application/json' });
+    res.write(JSON.stringify({ message }));
     res.end();
 }
 

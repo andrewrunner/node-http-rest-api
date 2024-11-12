@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { RequestHandler } from "../lib/request/request-handler";
 import CategoryModel from "../models/category.model";
-import { getCacheKeyFromRequest, sendJsonData } from "../lib/util";
+import { getCacheKeyFromRequest, sendJsonData, sendJsonError } from "../lib/util";
 
 
 export class GetCategoryHandler extends RequestHandler {
@@ -18,14 +18,17 @@ export class GetCategoryHandler extends RequestHandler {
         if(cachedData) {
             return sendJsonData(res, cachedData);
         }
-  
+        
+          
         this.isFetchingFromDB.lock(kacheKey);
-
-        const data = await CategoryModel.findAll();
-  
-        this.requestCache.set(kacheKey, data)
-        this.isFetchingFromDB.unlock(kacheKey);
-  
-        return sendJsonData(res, data);  
+        try {
+            const data = await CategoryModel.findAll();
+            this.requestCache.set(kacheKey, data)
+            return sendJsonData(res, data);
+        } catch(e) {
+            return sendJsonError(res)
+        } finally {
+            this.isFetchingFromDB.unlock(kacheKey);
+        }
     }
 }

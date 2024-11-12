@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { RequestHandler } from "../lib/request/request-handler";
 import StaffModel from "../models/staff.model";
-import { getCacheKeyFromRequest, sendJsonData } from "../lib/util";
+import { getCacheKeyFromRequest, sendJsonData, sendJsonError } from "../lib/util";
 
 export class GetStaffHandler extends RequestHandler {
 
@@ -18,13 +18,16 @@ export class GetStaffHandler extends RequestHandler {
             return sendJsonData(res, cachedData);
         }
   
-        this.isFetchingFromDB.lock(kacheKey);
 
-        const data = await StaffModel.findAll();
-  
-        this.requestCache.set(kacheKey, data)
-        this.isFetchingFromDB.unlock(kacheKey);
-  
-        return sendJsonData(res, data); 
+        this.isFetchingFromDB.lock(kacheKey);
+        try {
+            const data = await StaffModel.findAll();
+            this.requestCache.set(kacheKey, data)
+            return sendJsonData(res, data);
+        } catch(e) {
+            return sendJsonError(res)
+        } finally {
+            this.isFetchingFromDB.unlock(kacheKey);
+        }  
     }
 }

@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { RequestHandler } from "../lib/request/request-handler";
 import AddressModel from "../models/address.model";
-import { getCacheKeyFromRequest, sendJsonData } from "../lib/util";
+import { getCacheKeyFromRequest, sendJsonData, sendJsonError } from "../lib/util";
 
 export class GetAddressesHandler extends RequestHandler {
 
@@ -18,13 +18,16 @@ export class GetAddressesHandler extends RequestHandler {
             return sendJsonData(res, cachedData);
         }
   
+        
         this.isFetchingFromDB.lock(kacheKey);
-
-        const data = await AddressModel.findAll();
-  
-        this.requestCache.set(kacheKey, data)
-        this.isFetchingFromDB.unlock(kacheKey);
-  
-        return sendJsonData(res, data);
+        try {
+            const data = await AddressModel.findAll();
+            this.requestCache.set(kacheKey, data)
+            return sendJsonData(res, data);
+        } catch(e) {
+            return sendJsonError(res)
+        } finally {
+            this.isFetchingFromDB.unlock(kacheKey);
+        }
     }
 }
