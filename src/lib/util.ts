@@ -12,6 +12,15 @@ export async function sendJsonData(res:ServerResponse,  data:any) {
     res.end();
 }
 
+/**
+ * Transform pathname and query to kache key string
+ * Example:
+ * - pathname: /test
+ * - query: {title:qwerty, rows:10}
+ * - result: '/test/title:qwerty:rows:10' 
+ * 
+ * @param req - incoming request 
+ */
 export function getCacheKeyFromRequest(req:IncomingMessage) {
     const reqUrl = url.parse(req.url!, true);
     

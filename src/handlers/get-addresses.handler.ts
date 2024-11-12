@@ -3,7 +3,6 @@ import { RequestHandler } from "../lib/request/request-handler";
 import AddressModel from "../models/address.model";
 import { getCacheKeyFromRequest, sendJsonData } from "../lib/util";
 
-
 export class GetAddressesHandler extends RequestHandler {
 
     async handle(req:IncomingMessage, res:ServerResponse) {

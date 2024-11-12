@@ -20,8 +20,8 @@ export class InMemoryCache {
     }
 
     /**
-     * @param key 
-     * @param value
+     * @param key - key of data
+     * @param value - data to store
      * @param ttl - time to live in seconds
      */
     set(key:string, value:any, ttl:number) {

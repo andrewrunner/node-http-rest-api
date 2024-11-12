@@ -28,8 +28,8 @@ export class RequestHandlersCache {
 
 
     /**
-     * @param key 
-     * @param data 
+     * @param key - key of data
+     * @param data - data to store
      * @param inMemoryExpiration - ttl in-memory cache in seconds (15 seconds default)
      * @param redisExpiration - ttl redis cache in seconds (30 seconds default)
      */

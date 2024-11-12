@@ -26,7 +26,7 @@ docker-compose up -d dvd-rental-api
 
 
 #run tests
-docker-compose run dvd-rental-api npm test
+docker-compose run --rm dvd-rental-api npm test
 
 ```
 
